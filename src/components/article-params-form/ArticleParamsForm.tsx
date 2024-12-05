@@ -54,6 +54,7 @@ export const ArticleParamsForm = ({ setArticleStyles }: Props) => {
 			setContentWidth(styles.contentWidth);
 			setFontSize(styles.fontSizeOption);
 			setArticleStyles(styles);
+			refStyles.current = styles;
 		}
 	}, []);
 
@@ -85,7 +86,7 @@ export const ArticleParamsForm = ({ setArticleStyles }: Props) => {
 	const handleFormReset = (e: FormEvent) => {
 		e.preventDefault();
 
-		localStorage.removeItem('styles');
+		localStorage.setItem('styles', JSON.stringify(refStyles.current));
 
 		const {
 			fontFamilyOption,
