@@ -1,9 +1,8 @@
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { Text } from 'src/ui/text';
-
 import styles from './ArticleParamsForm.module.scss';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Select } from 'src/ui/select';
 import {
@@ -18,6 +17,7 @@ import {
 } from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 
 type Props = {
 	setArticleStyles: (articleStyles: ArticleStateType) => void;
@@ -26,6 +26,7 @@ type Props = {
 export const ArticleParamsForm = ({ setArticleStyles }: Props) => {
 	const [isFormOpen, setFormOpen] = useState<boolean>(false);
 	const refStyles = useRef<ArticleStateType>(defaultArticleState);
+	const refAside = useRef<HTMLDivElement>(null);
 
 	const [fontFamily, setFontFamily] = useState<OptionType>(
 		defaultArticleState.fontFamilyOption
@@ -56,17 +57,19 @@ export const ArticleParamsForm = ({ setArticleStyles }: Props) => {
 		}
 	}, []);
 
-	// добавил мемоизацию, чтобы Article не рендерить, если в форме ничего не поменялось
-	const articleStyles: ArticleStateType = useMemo(
-		() => ({
-			fontFamilyOption: fontFamily,
-			fontColor: fontColor,
-			backgroundColor: backgroundColor,
-			contentWidth: contentWidth,
-			fontSizeOption: fontSize,
-		}),
-		[fontFamily, fontColor, backgroundColor, contentWidth, fontSize]
-	);
+	useOutsideClickClose({
+		isOpen: isFormOpen,
+		rootRef: refAside,
+		onChange: setFormOpen,
+	});
+
+	const articleStyles: ArticleStateType = {
+		fontFamilyOption: fontFamily,
+		fontColor: fontColor,
+		backgroundColor: backgroundColor,
+		contentWidth: contentWidth,
+		fontSizeOption: fontSize,
+	};
 
 	const handleFormSubmit = (e: FormEvent) => {
 		e.preventDefault();
@@ -113,6 +116,7 @@ export const ArticleParamsForm = ({ setArticleStyles }: Props) => {
 				}}
 			/>
 			<aside
+				ref={refAside}
 				className={clsx(styles.container, {
 					[styles.container_open]: isFormOpen,
 				})}>
